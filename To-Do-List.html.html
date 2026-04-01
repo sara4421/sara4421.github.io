@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Planner Circle Premium</title>
+  <style>
+    :root {
+      --bg-1: #f7f8ff;
+      --bg-2: #eef2ff;
+      --surface: rgba(255,255,255,0.72);
+      --surface-strong: rgba(255,255,255,0.92);
+      --border: rgba(255,255,255,0.65);
+      --text: #171a35;
+      --muted: #72789a;
+      --primary: #6d5dfc;
+      --primary-2: #8f7cff;
+      --accent: #36cfc9;
+      --success: #19c37d;
+      --danger: #ff5c7c;
+      --warning: #ffb020;
+      --shadow-xl: 0 30px 80px rgba(51, 65, 122, 0.18);
+      --shadow-lg: 0 18px 45px rgba(83, 92, 153, 0.14);
+      --radius-xl: 32px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 20%, rgba(109,93,252,0.14), transparent 18%),
+        radial-gradient(circle at 85% 15%, rgba(54,207,201,0.15), transparent 16%),
+        radial-gradient(circle at 80% 75%, rgba(255,176,32,0.10), transparent 18%),
+        linear-gradient(180deg, var(--bg-1), var(--bg-2));
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      width: 380px;
+      height: 380px;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.22;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    body::before {
+      top: -120px;
+      right: -80px;
+      background: #7c6cff;
+    }
+
+    body::after {
+      bottom: -120px;
+      left: -60px;
+      background: #36cfc9;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+    }
+
+    .screen {
+      width: 100%;
+      max-width: 1180px;
+      min-height: min(850px, calc(100vh - 44px));
+      display: none;
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-xl);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .screen.active { display: grid; }
+
+    .hero-grid {
+      grid-template-columns: 1.05fr 0.95fr;
+    }
+
+    .hero-left,
+    .hero-right,
+    .form-area,
+    .dashboard-main,
+    .dashboard-side {
+      padding: 34px;
+    }
+
+    .hero-left {
+      background:
+        linear-gradient(140deg, rgba(109,93,252,0.95), rgba(93,74,240,0.92) 55%, rgba(54,207,201,0.88));
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-left::before,
+    .hero-left::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+    }
+
+    .hero-left::before {
+      width: 280px;
+      height: 280px;
+      top: -70px;
+      left: -80px;
+    }
+
+    .hero-left::after {
+      width: 220px;
+      height: 220px;
+      bottom: -80px;
+      right: -50px;
+    }
+
+    .brand-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.16);
+      border: 1px solid rgba(255,255,255,0.18);
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 26px;
+      backdrop-filter: blur(8px);
+    }
+
+    .brand-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 18px rgba(255,255,255,0.7);
+    }
+
+    .hero-title {
+      font-size: clamp(34px, 4vw, 58px);
+      line-height: 1.08;
+      margin: 0 0 18px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-subtitle {
+      margin: 0 0 28px;
+      line-height: 1.95;
+      font-size: 16px;
+      max-width: 560px;
+      color: rgba(255,255,255,0.92);
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .hero-stat {
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.18);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-stat strong {
+      display: block;
+      font-size: 26px;
+      margin-bottom: 4px;
+    }
+
+    .hero-stat span {
+      font-size: 13px;
+      color: rgba(255,255,255,0.84);
+    }
+
+    .floating-card {
+      margin-top: 30px;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 26px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      max-width: 520px;
+    }
+
+    .floating-card-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .mini-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .mini-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.10);
+    }
+
+    .mini-row small {
+      color: rgba(255,255,255,0.78);
+      font-size: 12px;
+    }
+
+    .mini-badge {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.16);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .panel-wrap {
+      max-width: 470px;
+      margin: 0 auto;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .panel-badge {
+      width: 66px;
+      height: 66px;
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(109,93,252,0.14), rgba(54,207,201,0.12));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      margin-bottom: 18px;
+      box-shadow: inset 0 0 0 1px rgba(109,93,252,0.08);
+    }
+
+    .panel-title {
+      margin: 0 0 8px;
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .panel-subtitle {
+      margin: 0 0 26px;
+      color: var(--muted);
+      line-height: 1.9;
+      font-size: 15px;
+    }
+
+    .field { margin-bottom: 15px; }
+
+    .field label {
+      display: block;
+      margin-bottom: 9px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #252a4d;
+    }
+
+    .input,
+    .select,
+    .date-input {
+      width: 100%;
+      border: 1px solid rgba(124, 132, 189, 0.16);
+      background: rgba(255,255,255,0.82);
+      border-radius: 18px;
+      padding: 16px 18px;
+      font-size: 15px;
+      outline: none;
+      transition: 0.22s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+
+    .input:focus,
+    .select:focus,
+    .date-input:focus {
+      border-color: rgba(109,93,252,0.42);
+      box-shadow: 0 0 0 5px rgba(109,93,252,0.12);
+      transform: translateY(-1px);
+    }
+
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 18px;
+      padding: 16px 18px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.22s ease;
+    }
+
+    .btn-primary {
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      box-shadow: 0 16px 34px rgba(109,93,252,0.26);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 38px rgba(109,93,252,0.30);
+    }
+
+    .btn-secondary {
+      background: rgba(245,247,255,0.92);
+      color: var(--text);
+      border: 1px solid rgba(120,130,190,0.14);
+    }
+
+    .btn-secondary:hover { transform: translateY(-1px); }
+
+    .tiny-note {
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.8;
+      text-align: center;
+    }
+
+    .dashboard-grid {
+      grid-template-columns: minmax(0, 1.15fr) 390px;
+    }
+
+    .glass-card {
+      background: var(--surface-strong);
+      border: 1px solid rgba(121, 130, 190, 0.12);
+      border-radius: 26px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .dashboard-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .welcome-block h1 {
+      margin: 0;
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .welcome-block p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    .dashboard-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      border: none;
+      padding: 12px 15px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.84);
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(76, 87, 148, 0.10);
+    }
+
+    .action-btn.primary {
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    }
+
+    .top-overview {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .circle-panel,
+    .insight-panel,
+    .tasks-panel,
+    .side-panel {
+      padding: 24px;
+    }
+
+    .circle-card {
+      position: relative;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top right, rgba(109,93,252,0.10), transparent 36%),
+        linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,249,255,0.96));
+    }
+
+    .circle-card::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      background: rgba(109,93,252,0.06);
+      top: -45px;
+      left: -45px;
+    }
+
+    .progress-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 8px 0 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .progress-circle {
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: conic-gradient(var(--primary) 0deg, rgba(109,93,252,0.08) 0deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.6),
+        0 20px 42px rgba(109,93,252,0.12);
+    }
+
+    .progress-circle::before {
+      content: "";
+      position: absolute;
+      width: 194px;
+      height: 194px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(247,248,255,0.98));
+      box-shadow: inset 0 0 0 1px rgba(109,93,252,0.06);
+    }
+
+    .progress-circle::after {
+      content: "";
+      position: absolute;
+      width: 232px;
+      height: 232px;
+      border-radius: 50%;
+      border: 1px dashed rgba(109,93,252,0.14);
+    }
+
+    .progress-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+
+    .percent {
+      font-size: 52px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -0.04em;
+    }
+
+    .percent-label {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+      max-width: 170px;
+      margin: 0 auto;
+    }
+
+    .circle-footer {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(109,93,252,0.08);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      height: 100%;
+    }
+
+    .insight-card {
+      padding: 18px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,249,255,0.98));
+      border: 1px solid rgba(118, 128, 188, 0.12);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.58);
+    }
+
+    .insight-card.highlight {
+      background: linear-gradient(135deg, rgba(109,93,252,0.10), rgba(54,207,201,0.07));
+    }
+
+    .insight-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .insight-value {
+      font-size: 30px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -0.03em;
+    }
+
+    .insight-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .tasks-panel .panel-head,
+    .side-panel .panel-head,
+    .timeline-card .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .panel-head h3 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .panel-head span {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .tasks-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 470px;
+      overflow: auto;
+      padding-left: 2px;
+    }
+
+    .tasks-list::-webkit-scrollbar,
+    .mini-scroll::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .tasks-list::-webkit-scrollbar-thumb,
+    .mini-scroll::-webkit-scrollbar-thumb {
+      background: rgba(109,93,252,0.22);
+      border-radius: 999px;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,249,255,0.98));
+      border: 1px solid rgba(118, 128, 188, 0.12);
+      box-shadow: 0 12px 28px rgba(94, 104, 164, 0.08);
+      transition: 0.22s ease;
+    }
+
+    .task-item:hover { transform: translateY(-2px); }
+
+    .task-main {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .check-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid rgba(109,93,252,0.18);
+      background: white;
+      cursor: pointer;
+      flex-shrink: 0;
+      position: relative;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+
+    .check-btn.completed {
+      background: linear-gradient(135deg, var(--success), #42d392);
+      border-color: transparent;
+      box-shadow: 0 12px 24px rgba(25,195,125,0.24);
+    }
+
+    .check-btn.completed::after {
+      content: "✓";
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .task-text { min-width: 0; }
+
+    .task-name {
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.65;
+      word-break: break-word;
+    }
+
+    .task-name.done {
+      text-decoration: line-through;
+      color: #8a8fa9;
+    }
+
+    .task-meta-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+    }
+
+    .task-chip {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .task-chip.type {
+      background: rgba(109,93,252,0.08);
+      color: var(--primary);
+    }
+
+    .task-chip.date {
+      background: rgba(255,176,32,0.10);
+      color: #9c6a00;
+    }
+
+    .delete-btn {
+      border: none;
+      background: rgba(255,92,124,0.10);
+      color: var(--danger);
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .empty-state {
+      border-radius: 24px;
+      padding: 36px 24px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed rgba(116,126,188,0.18);
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,249,255,0.98));
+      line-height: 2;
+    }
+
+    .side-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      height: 100%;
+    }
+
+    .focus-card {
+      padding: 22px;
+      border-radius: 26px;
+      background: linear-gradient(135deg, rgba(109,93,252,0.98), rgba(89,73,233,0.95));
+      color: white;
+      box-shadow: 0 24px 50px rgba(109,93,252,0.24);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .focus-card::after {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.10);
+      top: -70px;
+      left: -50px;
+    }
+
+    .focus-card h3 {
+      margin: 0 0 10px;
+      font-size: 21px;
+      font-weight: 800;
+      position: relative;
+      z-index: 1;
+    }
+
+    .focus-card p {
+      margin: 0;
+      line-height: 1.9;
+      color: rgba(255,255,255,0.90);
+      font-size: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .side-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .metric {
+      padding: 18px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,249,255,0.98));
+      border: 1px solid rgba(116,126,188,0.12);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .timeline-card {
+      flex: 1;
+      padding: 22px;
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,249,255,0.98));
+      border: 1px solid rgba(116,126,188,0.12);
+      min-height: 0;
+    }
+
+    .timeline-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 320px;
+      overflow: auto;
+      padding-left: 2px;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(109,93,252,0.04);
+    }
+
+    .timeline-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-top: 6px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      box-shadow: 0 0 0 6px rgba(109,93,252,0.08);
+      flex-shrink: 0;
+    }
+
+    .timeline-text strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .timeline-text span {
+      font-size: 12px;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 18, 44, 0.48);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 999;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+      animation: fadeIn 0.22s ease;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 420px;
+      border-radius: 30px;
+      padding: 26px;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(255,255,255,0.6);
+      box-shadow: 0 28px 70px rgba(22, 31, 76, 0.22);
+      text-align: center;
+      animation: popIn 0.24s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .modal::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 120px;
+      background: linear-gradient(135deg, rgba(109,93,252,0.12), rgba(54,207,201,0.10));
+      pointer-events: none;
+    }
+
+    .modal-icon {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 16px;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      background: linear-gradient(135deg, rgba(109,93,252,0.16), rgba(54,207,201,0.14));
+      color: var(--primary);
+      box-shadow: inset 0 0 0 1px rgba(109,93,252,0.08);
+      z-index: 1;
+    }
+
+    .modal-title {
+      position: relative;
+      z-index: 1;
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: -0.03em;
+    }
+
+    .modal-text {
+      position: relative;
+      z-index: 1;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.9;
+      margin-bottom: 18px;
+    }
+
+    .modal-actions {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .fade-up { animation: fadeUp .45s ease both; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(14px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 1080px) {
+      .screen.active.hero-grid,
+      .screen.active.dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .top-overview { grid-template-columns: 1fr; }
+      .dashboard-grid { min-height: auto; }
+      .dashboard-side { padding-top: 0; }
+    }
+
+    @media (max-width: 720px) {
+      .app { padding: 12px; }
+      .screen {
+        min-height: calc(100vh - 24px);
+        border-radius: 24px;
+      }
+      .hero-left,
+      .hero-right,
+      .form-area,
+      .dashboard-main,
+      .dashboard-side { padding: 22px; }
+      .hero-stats,
+      .insight-grid,
+      .side-metrics { grid-template-columns: 1fr; }
+      .progress-circle {
+        width: 220px;
+        height: 220px;
+      }
+      .progress-circle::before {
+        width: 164px;
+        height: 164px;
+      }
+      .progress-circle::after {
+        width: 196px;
+        height: 196px;
+      }
+      .dashboard-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .dashboard-actions { width: 100%; }
+      .dashboard-actions .action-btn { flex: 1; }
+      .modal-actions { grid-template-columns: 1fr; }
+      .panel-title,
+      .welcome-block h1 { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="screen hero-grid active" id="screen-name">
+      <div class="hero-left fade-up">
+        <div class="brand-chip"><span class="brand-dot"></span> كل إنجاز يبدأ بخطوه</div>
+        <p class="hero-subtitle">
+        </p>
+
+        <div class="floating-card">
+          <div class="floating-card-title">رحلة الاستخدام</div>
+          <div class="mini-timeline">
+            <div class="mini-row"><div><strong>1. الدخول بالاسم</strong><br><small>بداية شخصية خاصة بك</small></div><div class="mini-badge">Start</div></div>
+            <div class="mini-row"><div><strong>2. إضافة المهام</strong><br><small>مرة واحدة أو بتاريخ نهاية</small></div><div class="mini-badge">Tasks</div></div>
+            <div class="mini-row"><div><strong>3. لوحة الإنجاز</strong><br><small>دوائر، إحصائيات، ومتابعة كاملة</small></div><div class="mini-badge">Focus</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right fade-up">
+        <div class="panel-wrap">
+          <div class="panel-badge">✦</div>
+          <h2 class="panel-title">أهلًا بك</h2>
+          <p class="panel-subtitle">اكتبي اسمك أولًا للدخول إلى مساحتك الخاصة، وبعدها ابدئي ببناء أهدافك ومهامك اليومية بطريقة عصرية ومرتبة.</p>
+
+          <div class="field">
+            <label for="nameInput">ادخلي اسمك</label>
+            <input class="input" id="nameInput" type="text" placeholder="مثال: ساره" />
+          </div>
+
+          <button class="btn btn-primary" onclick="goToTaskForm()">ابدئي الآن</button>
+          <div class="tiny-note">يتم حفظ بياناتك محليًا داخل المتصفح حتى لا تفقدي تقدمك.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen hero-grid" id="screen-task-form">
+      <div class="hero-left fade-up">
+        <div class="brand-chip"><span class="brand-dot"></span> Add New Goal</div>
+        <div class="floating-card">
+          <div class="floating-card-title">أفكار لمهامك</div>
+          <div class="mini-timeline">
+            <div class="mini-row"><div><strong>مراجعة اختبار</strong><br><small>خلال هذا الأسبوع</small></div><div class="mini-badge">Study</div></div>
+            <div class="mini-row"><div><strong>إنهاء مشروع</strong><br><small>بموعد نهائي محدد</small></div><div class="mini-badge">Project</div></div>
+            <div class="mini-row"><div><strong>قراءة فصل جديد</strong><br><small>هدف سريع ومباشر</small></div><div class="mini-badge">Goal</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-area fade-up">
+        <div class="panel-wrap">
+          <div class="panel-badge">✓</div>
+          <h2 class="panel-title">إضافة المهمة</h2>
+          <p class="panel-subtitle">صممي يومك مثل ما تحبين: مهمة سريعة، أو هدف له تاريخ نهاية واضح.</p>
+
+          <div class="field">
+            <label for="taskInput">اسم المهمة</label>
+            <input class="input" id="taskInput" type="text" placeholder="مثال: مراجعة الفصل الثالث" />
+          </div>
+
+          <div class="field">
+            <label for="taskType">نوع المهمة</label>
+            <select class="select" id="taskType" onchange="toggleDateField()">
+              <option value="once">مرة واحدة</option>
+              <option value="deadline">تحتاج تاريخ نهاية</option>
+            </select>
+          </div>
+
+          <div class="field hidden" id="dateField">
+            <label for="taskDate">تاريخ النهاية</label>
+            <input class="date-input" id="taskDate" type="date" />
+          </div>
+
+          <button class="btn btn-primary" onclick="addTask()">حفظ المهمة</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen dashboard-grid" id="screen-dashboard">
+      <div class="dashboard-main fade-up">
+        <div class="dashboard-header">
+          <div class="welcome-block">
+            <h1 id="welcomeText">أهلًا</h1>
+            <p>لوحة تحكم مبهره تعرض نسبة الإنجاز، المهام، ومؤشرات تساعدك تكملي يومك بثقة.</p>
+          </div>
+          <div class="dashboard-actions">
+            <button class="action-btn primary" onclick="openTaskFormFromDashboard()">+ أضيفي مهمة</button>
+            <button class="action-btn" onclick="clearAllTasks()">تفريغ الكل</button>
+          </div>
+        </div>
+
+        <div class="top-overview">
+          <div class="glass-card circle-card circle-panel">
+            <div class="progress-wrap">
+              <div class="progress-circle" id="progressCircle">
+                <div class="progress-content">
+                  <div class="percent" id="progressPercent">0%</div>
+                  <div class="percent-label" id="progressLabel">لم يبدأ الإنجاز بعد</div>
+                </div>
+              </div>
+            </div>
+            <div class="circle-footer">
+              <div class="pill" id="focusPill">ابدئي أول خطوة</div>
+              <div class="pill" id="levelPill">مستوى الإنجاز: جديد</div>
+            </div>
+          </div>
+
+          <div class="insight-grid">
+            <div class="insight-card highlight">
+              <span class="insight-label">إجمالي المهام</span>
+              <div class="insight-value" id="totalTasks">0</div>
+              <div class="insight-desc">كل الأهداف التي أضفتِها داخل مساحتك الحالية.</div>
+            </div>
+            <div class="insight-card">
+              <span class="insight-label">المهام المكتملة</span>
+              <div class="insight-value" id="doneTasks">0</div>
+              <div class="insight-desc">كل مهمة أنجزتِها وتم تفعيلها بعلامة الإنجاز.</div>
+            </div>
+            <div class="insight-card">
+              <span class="insight-label">المهام المتبقية</span>
+              <div class="insight-value" id="remainingTasks">0</div>
+              <div class="insight-desc">هذه المساحة تمثل ما تبقى لك للوصول إلى 100%.</div>
+            </div>
+            <div class="insight-card highlight">
+              <span class="insight-label">حالة اليوم</span>
+              <div class="insight-value" id="todayMood">Ready</div>
+              <div class="insight-desc">تتغير تلقائيًا حسب مستوى التقدم الحالي لديك.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card tasks-panel">
+          <div class="panel-head">
+            <h3>قائمة المهام</h3>
+            <span>اضغطي على الدائرة الصغيرة لتغيير حالة الإنجاز</span>
+          </div>
+          <div class="tasks-list mini-scroll" id="tasksList"></div>
+        </div>
+      </div>
+
+      <div class="dashboard-side fade-up">
+        <div class="side-stack">
+          <div class="focus-card">
+            <h3>منطقة التركيز</h3>
+            <p id="focusMessage">أضيفي مجموعة أهدافك، وبعدها راقبي كيف تمتلئ الدائرة تدريجيًا بشكل مبهر مع كل إنجاز جديد.</p>
+          </div>
+
+          <div class="side-metrics">
+            <div class="metric glass-card">
+              <strong id="completionText">0%</strong>
+              <span>نسبة الإكمال الكلية</span>
+            </div>
+            <div class="metric glass-card">
+              <strong id="deadlineCount">0</strong>
+              <span>مهام لها تاريخ نهاية</span>
+            </div>
+          </div>
+
+          <div class="timeline-card glass-card">
+            <div class="panel-head">
+              <h3>سجل المهام</h3>
+              <span>آخر الإضافات</span>
+            </div>
+            <div class="timeline-list mini-scroll" id="timelineList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="taskModal">
+    <div class="modal">
+      <div class="modal-icon">✦</div>
+      <div class="modal-title">هل تريدين إضافة مهمة أخرى؟</div>
+      <div class="modal-text">اختاري نعم للرجوع مباشرة إلى إضافة مهمة جديدة، أو لا للانتقال إلى لوحة التحكم وعرض نسبة الإنجاز الحالية.</div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="handleAddAnother(true)">نعم</button>
+        <button class="btn btn-secondary" onclick="handleAddAnother(false)">لا</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEYS = {
+      name: 'planner_circle_name',
+      tasks: 'planner_circle_tasks'
+    };
+
+    let userName = localStorage.getItem(STORAGE_KEYS.name) || '';
+    let tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+
+    const screenName = document.getElementById('screen-name');
+    const screenTaskForm = document.getElementById('screen-task-form');
+    const screenDashboard = document.getElementById('screen-dashboard');
+    const taskModal = document.getElementById('taskModal');
+
+    function showScreen(screen) {
+      [screenName, screenTaskForm, screenDashboard].forEach(s => s.classList.remove('active'));
+      screen.classList.add('active');
+    }
+
+    function saveTasks() {
+      localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
+    }
+
+    function saveName() {
+      localStorage.setItem(STORAGE_KEYS.name, userName);
+    }
+
+    function goToTaskForm() {
+      const nameValue = document.getElementById('nameInput').value.trim();
+      if (!nameValue) {
+        alert('من فضلك ادخلي اسمك أولًا');
+        return;
+      }
+
+      userName = nameValue;
+      saveName();
+      document.getElementById('welcomeText').textContent = `أهلًا ${userName}`;
+      showScreen(screenTaskForm);
+    }
+
+    function openTaskFormFromDashboard() {
+      clearTaskForm();
+      showScreen(screenTaskForm);
+    }
+
+    function toggleDateField() {
+      const type = document.getElementById('taskType').value;
+      const dateField = document.getElementById('dateField');
+      if (type === 'deadline') {
+        dateField.classList.remove('hidden');
+      } else {
+        dateField.classList.add('hidden');
+        document.getElementById('taskDate').value = '';
+      }
+    }
+
+    function clearTaskForm() {
+      document.getElementById('taskInput').value = '';
+      document.getElementById('taskType').value = 'once';
+      document.getElementById('taskDate').value = '';
+      toggleDateField();
+    }
+
+    function openTaskModal() {
+      taskModal.classList.add('show');
+    }
+
+    function closeTaskModal() {
+      taskModal.classList.remove('show');
+    }
+
+    function addTask() {
+      const taskName = document.getElementById('taskInput').value.trim();
+      const taskType = document.getElementById('taskType').value;
+      const taskDate = document.getElementById('taskDate').value;
+
+      if (!taskName) {
+        alert('اكتبي اسم المهمة أولًا');
+        return;
+      }
+
+      if (taskType === 'deadline' && !taskDate) {
+        alert('حددي تاريخ النهاية لهذه المهمة');
+        return;
+      }
+
+      const newTask = {
+        id: Date.now(),
+        name: taskName,
+        type: taskType,
+        dueDate: taskType === 'deadline' ? taskDate : '',
+        completed: false,
+        createdAt: new Date().toISOString()
+      };
+
+      tasks.unshift(newTask);
+      saveTasks();
+      clearTaskForm();
+      openTaskModal();
+    }
+
+    function handleAddAnother(addMore) {
+      closeTaskModal();
+      if (addMore) {
+        showScreen(screenTaskForm);
+      } else {
+        goToDashboard();
+      }
+    }
+
+    function goToDashboard() {
+      document.getElementById('welcomeText').textContent = `أهلًا ${userName}`;
+      renderDashboard();
+      showScreen(screenDashboard);
+    }
+
+    function toggleTask(taskId) {
+      tasks = tasks.map(task => task.id === taskId ? { ...task, completed: !task.completed } : task);
+      saveTasks();
+      renderDashboard();
+    }
+
+    function deleteTask(taskId) {
+      tasks = tasks.filter(task => task.id !== taskId);
+      saveTasks();
+      renderDashboard();
+    }
+
+    function clearAllTasks() {
+      if (!tasks.length) return;
+      const ok = confirm('هل تريدين حذف كل المهام؟');
+      if (!ok) return;
+      tasks = [];
+      saveTasks();
+      renderDashboard();
+    }
+
+    function formatTaskType(task) {
+      return task.type === 'once' ? 'مرة واحدة' : 'بتاريخ نهاية';
+    }
+
+    function formatTaskDate(task) {
+      if (!task.dueDate) return '';
+      return `ينتهي: ${task.dueDate}`;
+    }
+
+    function getProgressData() {
+      const total = tasks.length;
+      const done = tasks.filter(task => task.completed).length;
+      const remaining = total - done;
+      const deadlines = tasks.filter(task => task.type === 'deadline').length;
+      const percent = total === 0 ? 0 : Math.round((done / total) * 100);
+      return { total, done, remaining, deadlines, percent };
+    }
+
+    function getProgressLabel(percent) {
+      if (percent === 0) return 'لم يبدأ الإنجاز بعد';
+      if (percent < 25) return 'بداية رائعة — الخطوة الأولى أجمل خطوة';
+      if (percent < 50) return 'مستوى جيد — أنتِ تتحركين بشكل ممتاز';
+      if (percent < 75) return 'منتصف الطريق — استمري بهذا الإيقاع';
+      if (percent < 100) return 'قريبة جدًا من القمة';
+      return 'إنجاز كامل — أداء مبهر';
+    }
+
+    function getFocusMessage(percent, total) {
+      if (!total) return 'أضيفي مجموعة أهدافك، وبعدها راقبي كيف تمتلئ الدائرة تدريجيًا بشكل مبهر مع كل إنجاز جديد.';
+      if (percent === 100) return 'مذهل! أنهيتِ كل المهام. هذا الشكل من التنظيم يعطي إحساس قوي بالسيطرة والنجاح.';
+      if (percent >= 70) return 'أنتِ الآن في أقوى مرحلة — بقي القليل جدًا لتصلي إلى 100%.';
+      if (percent >= 40) return 'التقدم واضح جدًا على الدائرة. استمري بنفس النسق والنتيجة ستكون جميلة.';
+      return 'الانطلاقة بدأت، وكل علامة إنجاز الآن ستصنع فرقًا بصريًا وتحفيزيًا كبيرًا.';
+    }
+
+    function getMood(percent, total) {
+      if (!total) return 'Ready';
+      if (percent === 100) return 'Done';
+      if (percent >= 70) return 'On Fire';
+      if (percent >= 40) return 'Focused';
+      return 'Starting';
+    }
+
+    function getLevel(percent) {
+      if (percent === 100) return 'مستوى الإنجاز: أسطوري';
+      if (percent >= 75) return 'مستوى الإنجاز: قوي جدًا';
+      if (percent >= 40) return 'مستوى الإنجاز: ممتاز';
+      if (percent > 0) return 'مستوى الإنجاز: متقدم';
+      return 'مستوى الإنجاز: جديد';
+    }
+
+    function getFocusPill(percent) {
+      if (percent === 100) return 'تم الوصول إلى القمة';
+      if (percent >= 75) return 'باقي لمسة أخيرة';
+      if (percent >= 40) return 'أنتِ في المسار الصحيح';
+      if (percent > 0) return 'بداية أنيقة';
+      return 'ابدئي أول خطوة';
+    }
+
+    function renderTimeline() {
+      const timelineList = document.getElementById('timelineList');
+      if (!tasks.length) {
+        timelineList.innerHTML = '<div class="empty-state">لا يوجد سجل بعد.<br>ابدئي بإضافة أول مهمة وسيظهر هنا.</div>';
+        return;
+      }
+
+      timelineList.innerHTML = tasks.slice(0, 8).map(task => `
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-text">
+            <strong>${escapeHtml(task.name)}</strong>
+            <span>${task.type === 'once' ? 'مهمة سريعة ومباشرة' : `لها موعد نهاية في ${escapeHtml(task.dueDate)}`}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderDashboard() {
+      const { total, done, remaining, deadlines, percent } = getProgressData();
+      const tasksList = document.getElementById('tasksList');
+      const progressCircle = document.getElementById('progressCircle');
+
+      document.getElementById('progressPercent').textContent = `${percent}%`;
+      document.getElementById('progressLabel').textContent = getProgressLabel(percent);
+      document.getElementById('totalTasks').textContent = total;
+      document.getElementById('doneTasks').textContent = done;
+      document.getElementById('remainingTasks').textContent = remaining;
+      document.getElementById('todayMood').textContent = getMood(percent, total);
+      document.getElementById('completionText').textContent = `${percent}%`;
+      document.getElementById('deadlineCount').textContent = deadlines;
+      document.getElementById('focusMessage').textContent = getFocusMessage(percent, total);
+      document.getElementById('focusPill').textContent = getFocusPill(percent);
+      document.getElementById('levelPill').textContent = getLevel(percent);
+
+      const degrees = percent * 3.6;
+      progressCircle.style.background = `conic-gradient(var(--primary) ${degrees}deg, rgba(109,93,252,0.08) 0deg)`;
+
+      if (!total) {
+        tasksList.innerHTML = '<div class="empty-state">لا توجد مهام حتى الآن.<br>ابدئي بإضافة أول مهمة لك، وبعدها ستبدأ الدائرة بالامتلاء.</div>';
+        renderTimeline();
+        return;
+      }
+
+      tasksList.innerHTML = tasks.map(task => `
+        <div class="task-item">
+          <div class="task-main">
+            <button class="check-btn ${task.completed ? 'completed' : ''}" onclick="toggleTask(${task.id})" aria-label="تحديد الإنجاز"></button>
+            <div class="task-text">
+              <div class="task-name ${task.completed ? 'done' : ''}">${escapeHtml(task.name)}</div>
+              <div class="task-meta-row">
+                <span class="task-chip type">${escapeHtml(formatTaskType(task))}</span>
+                ${task.dueDate ? `<span class="task-chip date">${escapeHtml(formatTaskDate(task))}</span>` : ''}
+              </div>
+            </div>
+          </div>
+          <button class="delete-btn" onclick="deleteTask(${task.id})">حذف</button>
+        </div>
+      `).join('');
+
+      renderTimeline();
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    window.onload = function() {
+      if (userName) {
+        document.getElementById('nameInput').value = userName;
+        goToDashboard();
+      } else {
+        showScreen(screenName);
+      }
+      toggleDateField();
+    };
+  </script>
+</body>
+</html>
